@@ -63,10 +63,16 @@ def format_price(price, coin):
         return f"${price:.2f}"
 
 # 初始化客户端
-deepseek_client = OpenAI(
-    api_key=os.getenv('OPENAI_API_KEY'),
-    base_url=os.getenv('OPENAI_BASE_URL')
-)
+api_keys_str = os.getenv("OPENAI_API_KEYS") or os.getenv("OPENAI_API_KEY", "")
+API_KEYS = [k.strip() for k in api_keys_str.split(",") if k.strip()]
+if not API_KEYS:
+    raise RuntimeError("没有找到任何 OpenAI/SiliconFlow API Key，请在 .env 中设置 OPENAI_API_KEYS 或 OPENAI_API_KEY")
+_api_key_cycle = itertools.cycle(API_KEYS)
+BASE_URL = os.getenv("OPENAI_BASE_URL")
+MODEL_NAME = os.getenv("OPENAI_MODEL_NAME", "deepseek-chat")
+def get_llm_client() -> OpenAI:
+    api_key = next(_api_key_cycle)
+    return OpenAI(api_key=api_key, base_url=BASE_URL)
 
 # 重试连接Binance（处理临时网络问题）
 print("🔗 正在连接Binance API...")
