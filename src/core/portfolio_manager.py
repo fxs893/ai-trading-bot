@@ -13,6 +13,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from binance.client import Client
 from binance.exceptions import BinanceAPIException
+import itertools
 import math
 
 from portfolio_statistics import PortfolioStatistics
